@@ -1,0 +1,5 @@
+*.bak
+/src/packed
+/src/lib
+/src/CEF4Delphi
+/src/backup

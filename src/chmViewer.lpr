@@ -10,12 +10,21 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
+  uCEFApplication,  // WICHTIG: Initialisiert CEF
   Forms, main
   { you can add units after this };
 
 {$R *.res}
 
 begin
+  GlobalCEFApp := TCefApplication.Create;
+
+  if not GlobalCEFApp.StartMainProcess then
+  begin
+    GlobalCEFApp.Free;
+    Halt(0);
+  end;
+
   RequireDerivedFormResource:=True;
   Application.Scaled:=True;
   Application.Initialize;
