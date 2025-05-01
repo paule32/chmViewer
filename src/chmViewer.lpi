@@ -121,6 +121,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="ChmHelpPkg"/>
+      </Item>
+      <Item>
         <PackageName Value="CEF4Delphi_Lazarus"/>
       </Item>
       <Item>

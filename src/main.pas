@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
-  Buttons, StdCtrls, Grids, Menus, uCEFChromiumWindow;
+  Buttons, StdCtrls, Grids, Menus, RegExpr, chmreader, chmfiftimain,
+  uCEFChromiumWindow;
 
 type
 
@@ -126,9 +127,157 @@ begin
 end;
 
 procedure TForm1.ChromiumWindow1AfterCreated(Sender: TObject);
+type
+  TTopicEntry = record
+    Topic:Integer;
+    Hits: Integer;
+    TitleHits: Integer;
+    FoundForThisRound: Boolean;
+  end;
+  TFoundTopics = array of TTopicEntry;
+var
+  FoundTopics: TFoundTopics;
+
+var
+  chmRead: TChmReader;
+  chmStream: TFileStream;
+
+  topicResults: chmfiftimain.TChmWLCTopicArray;
+  titleResults: chmfiftimain.TChmWLCTopicArray;
+
+  FIftiMainStream: TMemoryStream;
+  htmlStream: TMemoryStream;
+
+  searchReader: TChmSearchReader;
+  htmlText: String;
+
+  DocTitle: String;
+  DocURL: String;
+
+  k, currTopic: Integer;
+  html: TStringList;
+
+  function RenameImagesInHtml(HtmlText: string; ImageMap: TStrings): string;
+  var
+    Regex: TRegExpr;
+    OldPath, NewPath: string;
+    ImgCount: Integer;
+  begin
+    Regex := TRegExpr.Create;
+    try
+      Regex.Expression := '<img[^>]*src=["'']([^"''>]+)["'']';
+      Regex.ModifierI := True;
+      Regex.ModifierG := True;
+      ImgCount := ImageMap.Count;
+
+      Result := HtmlText;
+
+      while Regex.Exec(Result) do
+      begin
+        OldPath := Regex.Match[1];
+//        showmessage('old: ' + oldpath);
+        if ImageMap.IndexOfName(OldPath) < 0 then
+        begin
+          Inc(ImgCount);
+          NewPath := Format('T:\b\Lazarus\chmViewer\src\packed\lib\img_%4.4d%s', [ImgCount, ExtractFileExt(OldPath)]);
+//          showmessage('new: ' + newpath);
+
+          result := StringReplace(htmlText, oldpath, newpath, [rfReplaceAll]);
+//          ShowMessage(result);
+          exit;
+//          ImageMap.Values[OldPath] := NewPath;
+//          break;
+        end else
+        begin
+          NewPath := ImageMap.Values[OldPath];
+          showmessage('new: ' + oldpath);
+        end;
+
+        // Ersetze alle Vorkommen im HTML
+        Result := StringReplace(Result, OldPath, NewPath, [rfReplaceAll]);
+      end;
+    finally
+      Regex.Free;
+    end;
+  end;
+
+  procedure ExtractImagesFromChm(ImageMap: TStrings; const OutputFolder: string);
+  var
+    i: Integer;
+    Stream: TMemoryStream;
+    OldPath, NewPath, SavePath: string;
+  begin
+    ForceDirectories(OutputFolder);
+
+    for i := 0 to ImageMap.Count - 1 do
+    begin
+      OldPath := ImageMap.Names[i];
+      NewPath := ImageMap.ValueFromIndex[i];
+      Stream := TMemoryStream.Create;
+      try
+        Stream := ChmRead.GetObject(OldPath);
+        if stream <> nil then
+        begin
+          SavePath := IncludeTrailingPathDelimiter(OutputFolder) + NewPath;
+          Stream.SaveToFile(SavePath);
+        end else
+        begin
+          ShowMessage('stream error');
+          exit;
+        end;
+      finally
+        Stream.Free;
+      end;
+    end;
+  end;
 begin
   if Assigned(ChromiumWindow1.ChromiumBrowser) then
-  ChromiumWindow1.LoadURL('https://www.google.de');
+  begin
+    chmStream := TFileStream.Create(ParamStr(1), fmOpenRead or fmShareDenyWrite);
+    chmRead := TChmReader.Create(CHMStream, false);
+    html := TStringList.Create;
+    try
+      try
+        FIftiMainStream := chmRead.GetObject('/$FIftiMain');
+        if FIftiMainStream = nil then
+        begin
+          ShowMessage('Could not assign fiftimainstream.' + #10 + 'Aborting.');
+          halt(3);
+        end;
+
+        htmlStream := chmRead.GetObject('/index.htm');
+        if htmlStream = nil then
+        begin
+          ShowMessage('index not found');
+          exit;
+        end;
+        htmlStream.Position := 0;
+        html.LoadFromStream(htmlStream);
+
+        htmlText := html.Text;
+        ShowMessage(htmlText);
+        htmlText := RenameImagesInHtml(htmlText, html);
+        ShowMessage(htmltext);
+
+        ChromiumWindow1.ChromiumBrowser.LoadString(htmlText);
+      except
+        on E: Exception do
+        begin
+          ChromiumWindow1.ChromiumBrowser.LoadString(
+          '<h2>Page not found.</h2>');
+          exit;
+        end;
+      end;
+    finally
+      chmStream.Free;
+      chmRead.Free;
+      chmStream := nil;
+      chmRead := nil;
+      html.Clear;
+      html.Free;
+      html := nil;
+    end;
+  end;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);
