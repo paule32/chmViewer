@@ -4,3 +4,6 @@
 /src/CEF4Delphi
 /src/backup
 *.exe
+/src/chm/lib
+/src/chm/img
+/src/chm/img

@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
-  Buttons, StdCtrls, Grids, Menus, RegExpr, chmreader, chmfiftimain,
+  Buttons, StdCtrls, Grids, Menus, RegExpr, base64, chmreader, chmfiftimain,
   uCEFChromiumWindow;
 
 type
@@ -71,6 +71,9 @@ var
 implementation
 
 {$R *.lfm}
+
+var
+  TEMP_FOLDER: String;
 
 { TForm1 }
 
@@ -149,87 +152,264 @@ var
   htmlStream: TMemoryStream;
 
   searchReader: TChmSearchReader;
-  htmlText: String;
-
-  DocTitle: String;
-  DocURL: String;
+  htmlText, newpath: String;
 
   k, currTopic: Integer;
   html: TStringList;
 
-  function RenameImagesInHtml(HtmlText: string; ImageMap: TStrings): string;
+  function EncodeBase64(const Buffer: Pointer; const Size: Integer): string;
+  const
+    Base64Code: PAnsiChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
   var
-    Regex: TRegExpr;
-    OldPath, NewPath: string;
-    ImgCount: Integer;
+    I: Integer;
+    P: PByte;
+    Triplet: Cardinal;
   begin
-    Regex := TRegExpr.Create;
-    try
-      Regex.Expression := '<img[^>]*src=["'']([^"''>]+)["'']';
-      Regex.ModifierI := True;
-      Regex.ModifierG := True;
-      ImgCount := ImageMap.Count;
+    Result := '';
+    P := Buffer;
 
-      Result := HtmlText;
+    for I := 0 to (Size div 3) - 1 do
+    begin
+      Triplet := (P[0] shl 16) or (P[1] shl 8) or P[2];
+      Result := Result +
+                Base64Code[(Triplet shr 18) and $3F] +
+                Base64Code[(Triplet shr 12) and $3F] +
+                Base64Code[(Triplet shr 6) and $3F] +
+                Base64Code[Triplet and $3F];
+      Inc(P, 3);
+    end;
 
-      while Regex.Exec(Result) do
-      begin
-        OldPath := Regex.Match[1];
-//        showmessage('old: ' + oldpath);
-        if ImageMap.IndexOfName(OldPath) < 0 then
+    case Size mod 3 of
+      1:
         begin
-          Inc(ImgCount);
-          NewPath := Format('T:\b\Lazarus\chmViewer\src\packed\lib\img_%4.4d%s', [ImgCount, ExtractFileExt(OldPath)]);
-//          showmessage('new: ' + newpath);
-
-          result := StringReplace(htmlText, oldpath, newpath, [rfReplaceAll]);
-//          ShowMessage(result);
-          exit;
-//          ImageMap.Values[OldPath] := NewPath;
-//          break;
-        end else
-        begin
-          NewPath := ImageMap.Values[OldPath];
-          showmessage('new: ' + oldpath);
+          Triplet := P[0] shl 16;
+          Result := Result +
+                    Base64Code[(Triplet shr 18) and $3F] +
+                    Base64Code[(Triplet shr 12) and $3F] +
+                    '==';
         end;
+      2:
+        begin
+          Triplet := (P[0] shl 16) or (P[1] shl 8);
+          Result := Result +
+                    Base64Code[(Triplet shr 18) and $3F] +
+                    Base64Code[(Triplet shr 12) and $3F] +
+                    Base64Code[(Triplet shr 6) and $3F] +
+                    '=';
+        end;
+    end;
+  end;
 
-        // Ersetze alle Vorkommen im HTML
-        Result := StringReplace(Result, OldPath, NewPath, [rfReplaceAll]);
+  function ImageToBase64DataURI(const FilePath: string): string;
+  var
+    FS: TFileStream;
+    Buffer: Pointer;
+    Base64Str, MimeType: string;
+  begin
+    Result := '';
+    if not FileExists(FilePath) then Exit;
+
+    FS := TFileStream.Create(FilePath, fmOpenRead or fmShareDenyWrite);
+    try
+      GetMem(Buffer, FS.Size);
+      try
+        FS.ReadBuffer(Buffer^, FS.Size);
+        Base64Str := EncodeBase64(Buffer, FS.Size);
+      finally
+        FreeMem(Buffer);
       end;
     finally
-      Regex.Free;
+      FS.Free;
     end;
+
+    // MIME-Type ermitteln
+    case LowerCase(ExtractFileExt(FilePath)) of
+      '.png':  MimeType := 'image/png';
+      '.jpg', '.jpeg': MimeType := 'image/jpeg';
+      '.gif':  MimeType := 'image/gif';
+      '.bmp':  MimeType := 'image/bmp';
+      '.svg':  MimeType := 'image/svg+xml';
+    else
+      MimeType := 'application/octet-stream';
+    end;
+
+    Result := Format('data:%s;base64,%s', [MimeType, Base64Str]);
   end;
 
-  procedure ExtractImagesFromChm(ImageMap: TStrings; const OutputFolder: string);
+  procedure SaveStreamToFile(Stream: TStream; const FileName: string);
   var
-    i: Integer;
-    Stream: TMemoryStream;
-    OldPath, NewPath, SavePath: string;
+    FS: TFileStream;
   begin
-    ForceDirectories(OutputFolder);
-
-    for i := 0 to ImageMap.Count - 1 do
-    begin
-      OldPath := ImageMap.Names[i];
-      NewPath := ImageMap.ValueFromIndex[i];
-      Stream := TMemoryStream.Create;
-      try
-        Stream := ChmRead.GetObject(OldPath);
-        if stream <> nil then
-        begin
-          SavePath := IncludeTrailingPathDelimiter(OutputFolder) + NewPath;
-          Stream.SaveToFile(SavePath);
-        end else
-        begin
-          ShowMessage('stream error');
-          exit;
-        end;
-      finally
-        Stream.Free;
-      end;
+    Stream.Position := 0;
+    FS := TFileStream.Create(FileName, fmCreate);
+    try
+      FS.CopyFrom(Stream, Stream.Size);
+    finally
+      FS.Free;
     end;
   end;
+
+  procedure SaveStreamToTextFile(Stream: TStream; const FileName: string);
+  var
+    StringStream: TStringStream;
+    List: TStringList;
+  begin
+    Stream.Position := 0;
+
+    StringStream := TStringStream.Create('');
+    List := TStringList.Create;
+    try
+      StringStream.CopyFrom(Stream, Stream.Size);
+      List.Text := StringStream.DataString;
+      List.SaveToFile(FileName);
+    finally
+      StringStream.Free;
+      List.Free;
+    end;
+  end;
+
+  procedure CreateDirectories;
+  begin
+    //if not DirectoryExists(newpath) then
+    begin
+      ForceDirectories(TEMP_FOLDER + '\css');
+      ForceDirectories(TEMP_FOLDER + '\img');
+      ForceDirectories(TEMP_FOLDER + '\js');
+      ForceDirectories(TEMP_FOLDER + '\lib');
+      ForceDirectories(TEMP_FOLDER + '\lib\js');
+    end;
+  end;
+
+  function ExtractJavaScriptSources(HTML: string): String;
+  var
+    RE: TRegExpr;
+    SrcValue,s: string;
+  begin
+    result := html;
+    RE := TRegExpr.Create;
+    try
+      // Suche nach <script src="..."> oder <script src='...'>
+      RE.Expression := '<script[^>]*\bsrc\s*=\s*["'']([^"'']+)["'']';
+      RE.ModifierI := True;
+
+      if RE.Exec(HTML) then
+      repeat
+        SrcValue := RE.Match[1];
+        newpath  := TEMP_FOLDER;
+        s        := '/' + srcvalue;
+        CreateDirectories;
+
+        htmlStream.Clear;
+        htmlStream.Position := 0;
+
+        htmlStream := chmRead.GetObject(s);
+        if htmlStream = nil then
+        begin
+          ShowMessage('error: can not get:' + #10 + s);
+          Halt(3);
+        end;
+
+        newpath := Format('%s\%s', [newpath, SrcValue]);
+        newpath := StringReplace(NewPath, '/', '\', [rfReplaceAll]);
+
+        SaveStreamToTextFile(htmlStream, newpath);
+
+        s       := ImageToBase64DataURI(NewPath);
+        result  := StringReplace(result, srcvalue, s, [rfReplaceAll]);
+
+      until not RE.ExecNext;
+    finally
+      RE.Free;
+    end;
+  end;
+
+  function ExtractCSSLinks(HTML: string): string;
+  var
+    RE: TRegExpr;
+    srcValue,s : string;
+  begin
+    result := html;
+    RE := TRegExpr.Create;
+    try
+      // Suche nach <link ... rel="stylesheet" ... href="...">
+      RE.Expression := '<link[^>]*rel\s*=\s*["'']stylesheet["''][^>]*href\s*=\s*["'']([^"'']+)["'']';
+      RE.ModifierI := True;
+
+      if RE.Exec(HTML) then
+      repeat
+        SrcValue := RE.Match[1];
+        newpath  := TEMP_FOLDER;
+        s        := '/' + srcvalue;
+        CreateDirectories;
+
+        htmlStream.Clear;
+        htmlStream.Position := 0;
+
+        htmlStream := chmRead.GetObject(s);
+        if htmlStream = nil then
+        begin
+          ShowMessage('error: can not get:' + #10 + s);
+          Halt(3);
+        end;
+
+        newpath := Format('%s\%s', [newpath, SrcValue]);
+        newpath := StringReplace(NewPath, '/', '\', [rfReplaceAll]);
+
+        SaveStreamToTextFile(htmlStream, newpath);
+
+        s       := ImageToBase64DataURI(NewPath);
+        result  := StringReplace(result, srcvalue, s, [rfReplaceAll]);
+
+      until not RE.ExecNext;
+
+    finally
+      RE.Free;
+    end;
+  end;
+
+  function ExtractImageSources(HTML: string): String;
+  var
+    RE: TRegExpr;
+    SrcValue, s,newpath, img64: string;
+  begin
+    result := html;
+    RE := TRegExpr.Create;
+    try
+      // Suche nach <img src="..."> oder <img src='...'>
+      RE.Expression := '<img[^>]*\bsrc\s*=\s*["'']([^"'']+)["'']';
+      RE.ModifierI := True;
+
+      if RE.Exec(HTML) then
+      repeat
+        SrcValue := RE.Match[1];
+        newpath  := TEMP_FOLDER;
+        s        := '/' + srcvalue;
+        CreateDirectories;
+
+        htmlStream.Clear;
+        htmlStream.Position := 0;
+
+        htmlStream := chmRead.GetObject(s);
+        if htmlStream = nil then
+        begin
+          ShowMessage('error: can not get:' + #10 + s);
+          Halt(3);
+        end;
+
+        newpath := Format('%s\%s', [newpath, SrcValue]);
+        newpath := StringReplace(NewPath, '/', '\', [rfReplaceAll]);
+
+        SaveStreamToFile(htmlStream, newpath);
+
+        img64    := ImageToBase64DataURI(NewPath);
+        result   := StringReplace(result, srcvalue, img64, [rfReplaceAll]);
+
+      until not RE.ExecNext;
+    finally
+      RE.Free;
+    end;
+  end;
+
 begin
   if Assigned(ChromiumWindow1.ChromiumBrowser) then
   begin
@@ -255,16 +435,17 @@ begin
         html.LoadFromStream(htmlStream);
 
         htmlText := html.Text;
-        ShowMessage(htmlText);
-        htmlText := RenameImagesInHtml(htmlText, html);
-        ShowMessage(htmltext);
+
+        htmlText := ExtractCSSLinks         (htmlText);
+        htmlText := ExtractJavaScriptSources(htmlText);
+        htmlText := ExtractImageSources     (htmlText);
 
         ChromiumWindow1.ChromiumBrowser.LoadString(htmlText);
       except
         on E: Exception do
         begin
           ChromiumWindow1.ChromiumBrowser.LoadString(
-          '<h2>Page not found.</h2>');
+          '<style>body{background-color:white;}</style><h2>Page not found.</h2><br>' + E.Message);
           exit;
         end;
       end;
@@ -282,6 +463,7 @@ end;
 
 procedure TForm1.FormShow(Sender: TObject);
 begin
+  TEMP_FOLDER := ExtractFilePath(ParamStr(0)) + 'lib';
   if not ChromiumWindow1.Initialized then
   ChromiumWindow1.CreateBrowser;
   printFlag := false;
