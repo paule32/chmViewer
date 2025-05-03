@@ -27,6 +27,7 @@ jobs:
         restore-keys: lazarus-fpc-${{ runner.os }}-
 
     - name: Installi Lazarus/FPC
+      if: steps.cache-lazarus.outputs.cache-hit != 'true'
       shell: cmd
       run: |
         cd C:\tools
@@ -42,6 +43,7 @@ jobs:
         set BASEDIR=%cd%
         set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
+        C:\tools\lazarus\lazbuild.exe "%BASEDIR%\src\DCPcrypt\dcpcrypt_laz.lpk"
         C:\tools\lazarus\lazbuild.exe "C:\tools\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
         C:\tools\lazarus\lazbuild.exe "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
         
@@ -63,7 +65,11 @@ jobs:
         -vewnhibq ^
         -Filib\x86_64-win64 ^
         -Fusrc ^
-        -FuD:\a\chmViewer\chmViewer\src\CEF4Delphi\packages\lib\x86_64-win64 ^
+        -Fu%BASEDIR%\src\DCPcrypt ^
+        -Fu%BASEDIR%\src\DCPcrypt\Chiphers ^
+        -Fu%BASEDIR%\src\DCPcrypt\Hashes ^
+        -Fu%BASEDIR%\src\CEF4Delphi\source ^
+        -Fu%BASEDIR%\src\packages ^
         -FuC:\lazarus\components\ideintf\units\x86_64-win64\win32 ^
         -FuC:\lazarus\components\lazcontrols\lib\x86_64-win64\win32 ^
         -FuC:\lazarus\lcl\units\x86_64-win64\win32 ^
@@ -104,7 +110,34 @@ jobs:
       run: |
         export BASEDIR=$(pwd)
         echo "base: $BASEDIR"
-        /usr/bin/lazbuild $BASEDIR/src/chmViewer.lpi
+        /usr/bin/fpc ^
+        -Twin64 ^
+        -Px86_64 ^
+        -MDelphi ^
+        -Scghim ^
+        -CX ^
+        -O3 ^
+        -XX ^
+        -WG ^
+        -l ^
+        -vewnhibq ^
+        -Filib ^
+        -Fusrc ^
+        -FuD:\a\chmViewer\chmViewer\src\CEF4Delphi\packages\lib\x86_64-win64 ^
+        -FuC:\lazarus\components\ideintf\units\x86_64-win64\win32 ^
+        -FuC:\lazarus\components\lazcontrols\lib\x86_64-win64\win32 ^
+        -FuC:\lazarus\lcl\units\x86_64-win64\win32 ^
+        -FuC:\lazarus\lcl\units\x86_64-win64 ^
+        -FuC:\lazarus\components\freetype\lib\x86_64-win64 ^
+        -FuC:\lazarus\components\buildintf\units\x86_64-win64 ^
+        -FuC:\lazarus\components\lazutils\lib\x86_64-win64 ^
+        -FuC:\lazarus\packager\units\x86_64-win64 ^
+        -Fu. ^
+        -FUlib\x86_64-win64 ^
+        -FE. ^
+        -ochmViewer.exe ^
+        -dLCL ^
+        -dLCLwin32
 
     - name: Upload Linux binary
       uses: actions/upload-artifact@v4
