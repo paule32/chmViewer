@@ -76,40 +76,36 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
+        which lazarus
         
-    - name: Compile Lazarus project (.lpi)
+    - name: Compile CHM Viewer
       shell: bash
       run: |
         export BASEDIR=$(pwd)
         echo "base: $BASEDIR"
-        /usr/bin/fpc ^
-        -Twin64 ^
-        -Px86_64 ^
-        -MDelphi ^
-        -Scghim ^
-        -CX ^
-        -O3 ^
-        -XX ^
-        -WG ^
-        -l ^
-        -vewnhibq ^
-        -Filib ^
-        -Fusrc ^
-        -FuD:\a\chmViewer\chmViewer\src\CEF4Delphi\packages\lib\x86_64-win64 ^
-        -FuC:\lazarus\components\ideintf\units\x86_64-win64\win32 ^
-        -FuC:\lazarus\components\lazcontrols\lib\x86_64-win64\win32 ^
-        -FuC:\lazarus\lcl\units\x86_64-win64\win32 ^
-        -FuC:\lazarus\lcl\units\x86_64-win64 ^
-        -FuC:\lazarus\components\freetype\lib\x86_64-win64 ^
-        -FuC:\lazarus\components\buildintf\units\x86_64-win64 ^
-        -FuC:\lazarus\components\lazutils\lib\x86_64-win64 ^
-        -FuC:\lazarus\packager\units\x86_64-win64 ^
-        -Fu. ^
-        -FUlib\x86_64-win64 ^
-        -FE. ^
-        -ochmViewer.exe ^
-        -dLCL ^
-        -dLCLwin32
+        /usr/bin/fpc \
+        -Tlinux -Px86_64 -MDelphi -Scghim \
+        -CX -O3 -XX -WG -l \
+        -vewnhibq \
+        -Fi$BASEDIR/src/lib \
+        -Fu$BASEDIR/src \
+        -Fu$BASEDIR/src/DCPcrypt \
+        -Fu$BASEDIR/src/DCPcrypt/Chiphers \
+        -Fu$BASEDIR/src/DCPcrypt/Hashes \
+        -Fu$BASEDIR/src/CEF4Delphi/source \
+        -Fu$BASEDIR/src/packages \
+        -Fu/lazarus/components/ideintf \
+        -Fu/lazarus/components/lazcontrols \
+        -Fu/lazarus/lcl \
+        -Fu/lazarus/components/freetype \
+        -Fu/lazarus/components/buildintf \
+        -Fu/lazarus/components/lazutils \
+        -Fu/lazarus/packager/ \
+        -Fu$BASEDIR/src \
+        -FU$BASEDIR/src/lib \
+        -FE$BASEDIR/src \
+        -o$BASEDIR/chmViewer \
+        -dLCL $BASEDIR/src/chmViewer.lpr
 
     - name: Upload Linux binary
       uses: actions/upload-artifact@v4
