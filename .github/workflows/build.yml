@@ -8,6 +8,7 @@ on:
 
 jobs:
   build-windows:
+    name: Windows 10 Pro 64-Bit
     runs-on: windows-latest
 
     steps:
@@ -20,31 +21,49 @@ jobs:
         choco install lazarus --yes
 
     - name: Compile Lazarus project (.lpi)
-      run: "C:\\Lazarus\\lazbuild.exe chmViewer.lpi"
+      run: |
+        echo where:h
+        where lazbuild.exe
+        where fpc.exe
+        echo which
+        which lazbuild.exe
+        which fpc.exe
+        
+#      run: "C:\\Lazarus\\lazbuild.exe chmViewer.lpi"
     
-    - name: Upload Windows binary
-      uses: actions/upload-artifact@v4
-      with:
-        name: chmViewer-Windows.exe
-        path: chmViewer.exe
+#    - name: Upload Windows binary
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: chmViewer-Windows.exe
+#        path: chmViewer.exe
         
   build-linux:
-      runs-on: ubuntu-latest
-      steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    name: Build for Linux
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
   
-      - name: Install FPC + Lazarus
-        run: |
-          sudo apt update
-          sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
-
-      - name: Compile Lazarus project (.lpi)
-        run: lazbuild chmViewer.lpi
-
-      - name: Upload Linux binary
-        uses: actions/upload-artifact@v4
-        with:
-          name: chmViewer-linux
-          path: chmViewer
+    - name: Install FPC + Lazarus
+      run: |
+        sudo apt update
+        sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
+        
+    - name: Compile Laz
+      run: |
+        echo "where:h"
+        where lazbuild
+        where fpc
+        echo "which"
+        which lazbuild
+        which fpc
+        
+#    - name: Compile Lazarus project (.lpi)
+#      run: lazbuild chmViewer.lpi
+#
+#    - name: Upload Linux binary
+#      uses: actions/upload-artifact@v4
+#      with:
+#        name: chmViewer-linux
+#        path: chmViewer
 
