@@ -7,3 +7,4 @@
 *.exe
 /src/chm/lib
 /src/chm/img
+/src/DCPcrypt/lib
