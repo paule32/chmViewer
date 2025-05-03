@@ -249,11 +249,12 @@ var
     end;
   end;
 
-  procedure SaveStreamToTextFile(Stream: TStream; const FileName: string);
+  function SaveStreamToTextFile(Stream: TStream; const FileName: string): String;
   var
     StringStream: TStringStream;
     List: TStringList;
   begin
+    result := '';
     Stream.Position := 0;
 
     StringStream := TStringStream.Create('');
@@ -284,6 +285,32 @@ var
   var
     RE: TRegExpr;
     SrcValue,s: string;
+
+    function JavaScriptToBase64DataURI(const FileName: string): string;
+    var
+      InputStream: TFileStream;
+      OutputStream: TStringStream;
+      Encoder: TBase64EncodingStream;
+    begin
+      InputStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+      OutputStream := TStringStream.Create('');
+      try
+        // Encoder schreibt base64 direkt in OutputStream
+        Encoder := TBase64EncodingStream.Create(OutputStream);
+        try
+          Encoder.CopyFrom(InputStream, InputStream.Size);
+        finally
+          Encoder.Free;
+        end;
+
+        // Ergebnis mit MIME-Type prefix
+        Result := 'data:text/javascript;base64,' + OutputStream.DataString;
+      finally
+        InputStream.Free;
+        OutputStream.Free;
+      end;
+    end;
+
   begin
     result := html;
     RE := TRegExpr.Create;
@@ -314,7 +341,7 @@ var
 
         SaveStreamToTextFile(htmlStream, newpath);
 
-        s       := ImageToBase64DataURI(NewPath);
+        s       := JavaScriptToBase64DataURI(NewPath);
         result  := StringReplace(result, srcvalue, s, [rfReplaceAll]);
 
       until not RE.ExecNext;
@@ -327,6 +354,32 @@ var
   var
     RE: TRegExpr;
     srcValue,s : string;
+
+    function CSSToBase64DataURI(const FileName: string): string;
+    var
+      InputStream: TFileStream;
+      OutputStream: TStringStream;
+      Encoder: TBase64EncodingStream;
+    begin
+      InputStream := TFileStream.Create(FileName, fmOpenRead or fmShareDenyWrite);
+      OutputStream := TStringStream.Create('');
+      try
+        // Encoder schreibt base64 direkt in OutputStream
+        Encoder := TBase64EncodingStream.Create(OutputStream);
+        try
+          Encoder.CopyFrom(InputStream, InputStream.Size);
+        finally
+          Encoder.Free;
+        end;
+
+        // Ergebnis mit MIME-Type prefix
+        Result := 'data:text/css;base64,' + OutputStream.DataString;
+      finally
+        InputStream.Free;
+        OutputStream.Free;
+      end;
+    end;
+
   begin
     result := html;
     RE := TRegExpr.Create;
@@ -357,7 +410,7 @@ var
 
         SaveStreamToTextFile(htmlStream, newpath);
 
-        s       := ImageToBase64DataURI(NewPath);
+        s       := CSSToBase64DataURI(NewPath);
         result  := StringReplace(result, srcvalue, s, [rfReplaceAll]);
 
       until not RE.ExecNext;
