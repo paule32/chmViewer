@@ -62,53 +62,9 @@ jobs:
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
       with:
-        name: chmViewer-Windows.exe
+        name: chmViewer-Windows
         path: chmViewer.exe
-        
-  build-linux:
-    name: Build for Linux
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
-  
-    - name: Install FPC + Lazarus
-      run: |
-        sudo apt update
-        sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
-        which lazarus
-        
-    - name: Compile CHM Viewer
-      shell: bash
-      run: |
-        export BASEDIR=$(pwd)
-        echo "base: $BASEDIR"
-        /usr/bin/fpc \
-        -Tlinux -Px86_64 -MDelphi -Scghim \
-        -CX -O3 -XX -WG -l \
-        -vewnhibq \
-        -Fi$BASEDIR/src/lib \
-        -Fu$BASEDIR/src \
-        -Fu$BASEDIR/src/DCPcrypt \
-        -Fu$BASEDIR/src/DCPcrypt/Chiphers \
-        -Fu$BASEDIR/src/DCPcrypt/Hashes \
-        -Fu$BASEDIR/src/CEF4Delphi/source \
-        -Fu$BASEDIR/src/packages \
-        -Fu/lazarus/components/ideintf \
-        -Fu/lazarus/components/lazcontrols \
-        -Fu/lazarus/lcl \
-        -Fu/lazarus/components/freetype \
-        -Fu/lazarus/components/buildintf \
-        -Fu/lazarus/components/lazutils \
-        -Fu/lazarus/packager/ \
-        -Fu$BASEDIR/src \
-        -FU$BASEDIR/src/lib \
-        -FE$BASEDIR/src \
-        -o$BASEDIR/chmViewer \
-        -dLCL $BASEDIR/src/chmViewer.lpr
 
-    - name: Upload Linux binary
-      uses: actions/upload-artifact@v4
       with:
         name: chmViewer-linux
         path: chmViewer
