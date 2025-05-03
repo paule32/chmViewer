@@ -1,0 +1,63 @@
+name: Build CHM Viewer
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-windows:
+    name: Windows 10 Pro 64-Bit
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+      
+    - name: Install Lazarus & FPC
+      run: |
+        choco install fpc --yes
+        choco install lazarus --yes
+
+    - name: Compile chmViewer Project
+      shell: cmd
+      run: |
+        set BASEDIR=%cd%
+        dir %BASEDIR%
+        C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe ^
+        -Twin64 ^
+        -Px86_64 ^
+        -MDelphi ^
+        -Scghim ^
+        -CX ^
+        -O3 ^
+        -XX ^
+        -WG ^
+        -l ^
+        -vewnhibq ^
+        -Filib\x86_64-win64 ^
+        -Fu%BASEDIR%\src ^
+        -Fu%BASEDIR%\src\DCPcrypt ^
+        -Fu%BASEDIR%\src\DCPcrypt\Chiphers ^
+        -Fu%BASEDIR%\src\DCPcrypt\Hashes ^
+        -Fu%BASEDIR%\src\CEF4Delphi\source ^
+        -Fu%BASEDIR%\src\packages ^
+        -FuC:\lazarus\components\ideintf\units\x86_64-win64\win32 ^
+        -FuC:\lazarus\components\lazcontrols\lib\x86_64-win64\win32 ^
+        -FuC:\lazarus\lcl\units\x86_64-win64\win32 ^
+        -FuC:\lazarus\lcl\units\x86_64-win64 ^
+        -FuC:\lazarus\components\freetype\lib\x86_64-win64 ^
+        -FuC:\lazarus\components\buildintf\units\x86_64-win64 ^
+        -FuC:\lazarus\components\lazutils\lib\x86_64-win64 ^
+        -FuC:\lazarus\packager\units\x86_64-win64 ^
+        -Fu%BASEDIR%\src^
+        -FU%BASEDIR%\src\lib\x86_64-win64 ^
+        -FE%BASEDIR%\src ^
+        -o%BASEDIR%\chmViewer.exe ^
+        -dLCL ^
+        -dLCLwin32 %BASEDIR%\src\chmViewer.lpr
+
+    - name: Upload Windows binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: chmViewer-Windows
+        path: chmViewer.exe
