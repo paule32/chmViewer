@@ -15,15 +15,19 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v3
 
-    - name: Install Lazarus & FPC
-      run: |
-        choco install fpc --yes
-        choco install lazarus --yes
-
+#    - name: Install Lazarus & FPC
+#      run: |
+#        choco install fpc --yes
+#        choco install lazarus --yes
+#
     - name: Compile Lazarus project (.lpi)
+      shell: cmd
       run: |
-        where lazbuild
-        where fpc
+        cd
+        dir C:\
+        
+#        where lazbuild
+#        where fpc
         
 #      run: "C:\\Lazarus\\lazbuild.exe chmViewer.lpi"
     
