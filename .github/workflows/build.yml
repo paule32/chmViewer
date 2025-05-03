@@ -18,8 +18,8 @@ jobs:
         choco install fpc --yes
         choco install lazarus --yes
 
-    - name: Set PATH
-      run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
+#    - name: Set PATH
+#      run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
         
     - name: Compile chmViewer Project
       shell: cmd
