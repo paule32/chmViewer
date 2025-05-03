@@ -21,7 +21,7 @@ jobs:
     - name: Compile CHM Library Package
       shell: cmd
       run: |
-        set %BASEDIR%=%cd%
+        set BASEDIR=%cd%
         set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
         C:\lazarus\lazbuild.exe "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
