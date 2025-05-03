@@ -1,0 +1,36 @@
+name: Cache Lazarus & FPC for Linux
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Restore Lazarus/FPC Cache
+        uses: actions/cache@v4
+        id: cache-lazarus
+        with:
+          path: ~/tools/lazarus
+          key: linux-lazarus-fpc-${{ runner.os }}-v1
+
+      - name: Install Lazarus/FPC (wenn kein Cache)
+        if: steps.cache-lazarus.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/tools
+          cd ~/tools
+          curl -L -o fpcupdeluxe https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/latest/download/fpcupdeluxe-x86_64-linux
+          chmod +x fpcupdeluxe
+          ./fpcupdeluxe --installdir=~/tools/lazarus --fpcURL=stable --lazURL=stable
+
+      - name: Set PATH
+        run: echo "$HOME/tools/lazarus" >> $GITHUB_PATH
+
+      - name: Build with lazbuild
+        run: |
+          lazbuild myproject.lpi
