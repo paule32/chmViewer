@@ -18,9 +18,6 @@ jobs:
         choco install fpc --yes
         choco install lazarus --yes
 
-#    - name: Set PATH
-#      run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
-        
     - name: Compile chmViewer Project
       shell: cmd
       run: |
@@ -64,7 +61,3 @@ jobs:
       with:
         name: chmViewer-Windows
         path: chmViewer.exe
-
-      with:
-        name: chmViewer-linux
-        path: chmViewer
