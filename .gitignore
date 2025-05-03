@@ -1,10 +1,9 @@
 *.bak
+/src/CEF4Delphi/packages/backup
+/src/CEF4Delphi/packages/lib
 /src/packed
-/src/lib
-/src/CEF4Delphi
 /src/backup
+/src/lib
 *.exe
 /src/chm/lib
 /src/chm/img
-/src/chm/img
-src/chm/img/arrow_right.png
