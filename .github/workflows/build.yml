@@ -22,12 +22,8 @@ jobs:
 
     - name: Compile Lazarus project (.lpi)
       run: |
-        echo where:h
-        where lazbuild.exe
-        where fpc.exe
-        echo which
-        which lazbuild.exe
-        which fpc.exe
+        dir
+        dir C:\\
         
 #      run: "C:\\Lazarus\\lazbuild.exe chmViewer.lpi"
     
@@ -50,13 +46,7 @@ jobs:
         sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
         
     - name: Compile Laz
-      run: |
-        echo "where:h"
-        where lazbuild
-        where fpc
-        echo "which"
-        which lazbuild
-        which fpc
+      run: where lazbuild && where fpc && which lazbuild && which fpc
         
 #    - name: Compile Lazarus project (.lpi)
 #      run: lazbuild chmViewer.lpi
