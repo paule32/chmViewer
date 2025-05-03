@@ -33,4 +33,4 @@ jobs:
 
       - name: Build with lazbuild
         run: |
-          lazbuild myproject.lpi
+          lazbuild src/chmViewer.lpi
