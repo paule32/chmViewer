@@ -15,27 +15,29 @@ jobs:
     - name: Checkout source
       uses: actions/checkout@v3
 
-#    - name: Install Lazarus & FPC
-#      run: |
-#        choco install fpc --yes
-#        choco install lazarus --yes
-#
-    - name: Compile Lazarus project (.lpi)
+    - name: Install Lazarus & FPC
       shell: cmd
       run: |
-        cd
-        dir C:\
+        choco install fpc --yes
+        choco install lazarus --yes
+
+    - name: Compile CHM Library Package
+      shell: cmd
+      run: |
+        set PATH=%PATH%;C:\lazarus;C:\\azarus\fpc\3.2.2\bin\x86_64-win64
+        echo %PATH%
+        C:\lazarus\lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
         
-#        where lazbuild
-#        where fpc
-        
-#      run: "C:\\Lazarus\\lazbuild.exe chmViewer.lpi"
+    - name: Compile chmViewer Project
+      shell: cmd
+      run: |
+        C:\Lazarus\lazbuild.exe chmViewer.lpi
     
-#    - name: Upload Windows binary
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: chmViewer-Windows.exe
-#        path: chmViewer.exe
+    - name: Upload Windows binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: chmViewer-Windows.exe
+        path: chmViewer.exe
         
   build-linux:
     name: Build for Linux
@@ -54,12 +56,13 @@ jobs:
         which lazbuild
         which fpc
         
-#    - name: Compile Lazarus project (.lpi)
-#      run: lazbuild chmViewer.lpi
-#
-#    - name: Upload Linux binary
-#      uses: actions/upload-artifact@v4
-#      with:
-#        name: chmViewer-linux
-#        path: chmViewer
+    - name: Compile Lazarus project (.lpi)
+      shell: bash
+      run: |
+        /usr/bin/lazbuild chmViewer.lpi
 
+    - name: Upload Linux binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: chmViewer-linux
+        path: chmViewer
