@@ -20,23 +20,13 @@ jobs:
 
     - name: Set PATH
       run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
-
-    - name: Compile CHM Library Package
-      shell: cmd
-      run: |
-        set BASEDIR=%cd%
-        set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
-        echo %PATH%
-        C:\lazarus\lazbuild.exe "%BASEDIR%\src\DCPcrypt\dcpcrypt_laz.lpk"
-        C:\lazarus\lazbuild.exe "C:\tools\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
-        C:\lazarus\lazbuild.exe "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
         
     - name: Compile chmViewer Project
       shell: cmd
       run: |
         set BASEDIR=%cd%
         dir %BASEDIR%
-        C:\tools\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe ^
+        C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe ^
         -Twin64 ^
         -Px86_64 ^
         -MDelphi ^
@@ -48,7 +38,7 @@ jobs:
         -l ^
         -vewnhibq ^
         -Filib\x86_64-win64 ^
-        -Fusrc ^
+        -Fu%BASEDIR%\src ^
         -Fu%BASEDIR%\src\DCPcrypt ^
         -Fu%BASEDIR%\src\DCPcrypt\Chiphers ^
         -Fu%BASEDIR%\src\DCPcrypt\Hashes ^
@@ -62,15 +52,13 @@ jobs:
         -FuC:\lazarus\components\buildintf\units\x86_64-win64 ^
         -FuC:\lazarus\components\lazutils\lib\x86_64-win64 ^
         -FuC:\lazarus\packager\units\x86_64-win64 ^
-        -Fu. ^
-        -FUlib\x86_64-win64 ^
-        -FE. ^
-        -ochmViewer.exe ^
+        -Fu%BASEDIR%\src^
+        -FU%BASEDIR%\src\lib\x86_64-win64 ^
+        -FE%BASEDIR%\src ^
+        -o%BASEDIR%\chmViewer.exe ^
         -dLCL ^
-        -dLCLwin32
+        -dLCLwin32 %BASEDIR%\src\chmViewer.lpr
 
-      #C:\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
-    
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
       with:
