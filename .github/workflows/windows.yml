@@ -18,7 +18,15 @@ jobs:
       run: |
         choco install fpc --yes
         choco install lazarus --yes
-        refreshenv
+
+    - name: Add Lazarus to PATH
+      run: echo "C:\lazarus" | Out-File -Append -Encoding ascii $env:GITHUB_PATH
+
+    - name: Refresh Environment
+      run: refreshenv
+
+    - name: Build Lazarus Project
+      run: lazbuild chmViewer.lpi
         
   build-linux:
       runs-on: ubuntu-latest
