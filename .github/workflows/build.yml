@@ -19,14 +19,14 @@ jobs:
         choco install fpc --yes
         choco install lazarus --yes
 
-    - name: Add Lazarus to PATH
-      run: echo "C:\lazarus" | Out-File -Append -Encoding ascii $env:GITHUB_PATH
-
-    - name: Refresh Environment
-      run: refreshenv
-
-    - name: Build Lazarus Project
-      run: lazbuild chmViewer.lpi
+    - name: Compile Lazarus project (.lpi)
+      run: "C:\\Lazarus\\lazbuild.exe chmViewer.lpi"
+    
+    - name: Upload Windows binary
+      uses: actions/upload-artifact@v4
+      with:
+        name: chmViewer-Windows.exe
+        path: chmViewer.exe
         
   build-linux:
       runs-on: ubuntu-latest
@@ -38,3 +38,13 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
+
+      - name: Compile Lazarus project (.lpi)
+        run: lazbuild chmViewer.lpi
+
+      - name: Upload Linux binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: chmViewer-linux
+          path: chmViewer
+
