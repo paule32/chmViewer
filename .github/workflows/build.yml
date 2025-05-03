@@ -26,13 +26,6 @@ jobs:
       run: |
         set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
-        dir C:\lazarus\fpc
-        dir C:\lazarus\fpc\3.2.2
-        dir C:\lazarus\fpc\3.2.2\bin
-        dir C:\lazarus\components\help
-        dir C:\lazarus\components\chmhelp
-        dir C:\lazarus\components\chmhelp\packages
-        dir C:\lazarus\components\chmhelp\packages\help
         C:\lazarus\lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
         
     - name: Compile chmViewer Project
@@ -40,7 +33,7 @@ jobs:
       run: |
         set BASEDIR=%cd%
         dir %BASEDIR%
-        C:\Lazarus\lazbuild.exe "%BASEDIR%\chmViewer.lpi
+        C:\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
     
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
@@ -70,7 +63,7 @@ jobs:
       run: |
         export BASEDIR=$(pwd)
         echo "base: $BASEDIR"
-        /usr/bin/lazbuild $BASEDIR/chmViewer.lpi
+        /usr/bin/lazbuild $BASEDIR/src/chmViewer.lpi
 
     - name: Upload Linux binary
       uses: actions/upload-artifact@v4
