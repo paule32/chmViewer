@@ -1,4 +1,4 @@
-name: Build CHM Viewer for Windows and Linux
+name: Build CHM Viewer
 
 on:
   push:
@@ -24,14 +24,24 @@ jobs:
     - name: Compile CHM Library Package
       shell: cmd
       run: |
-        set PATH=%PATH%;C:\lazarus;C:\\azarus\fpc\3.2.2\bin\x86_64-win64
+        set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
-        C:\lazarus\lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
+        dir C:\lazarus\fpc
+        dir C:\lazarus\fpc\3.2.2
+        dir C:\lazarus\fpc\3.2.2\bin
+        dir C:\lazarus\components\help
+        dir C:\lazarus\components\chmhelp
+        dir C:\library\components\chmhelp\packages
+        dir C:\library\components\chmhelp\packages\help
+        
+    #C:\lazarus\lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
         
     - name: Compile chmViewer Project
       shell: cmd
       run: |
-        C:\Lazarus\lazbuild.exe chmViewer.lpi
+        set BASEDIR=%cd%
+        echo %BASEDIR%
+        C:\Lazarus\lazbuild.exe "%BASEDIR%\chmViewer.lpi
     
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
