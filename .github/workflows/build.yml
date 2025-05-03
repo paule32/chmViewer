@@ -12,22 +12,20 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v3
-      
-    - name: Restore Lazarus/FPC Cache
-      uses: actions/cache@v4
-      with:
-        path: C:\tools\lazarus
-        key: lazarus-fpc-${{ runner.os }}-v1
-        restore-keys: lazarus-fpc-${{ runner.os }}-
-    
+
+    - name: Install Lazarus & FPC
+      run: |
+        choco install fpc --yes
+        choco install lazarus --yes
+        
     - name: Compile CHM Library Package
       shell: cmd
       run: |
         set %BASEDIR%=%cd%
         set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
-        lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
-        lazbuild "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
+        C:\lazarus\lazbuild.exe "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
+        C:\lazarus\lazbuild.exe "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
         dir
         
     - name: Compile chmViewer Project
@@ -35,7 +33,7 @@ jobs:
       run: |
         set BASEDIR=%cd%
         dir %BASEDIR%
-        C:\tools\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
+        C:\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
     
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
@@ -54,11 +52,6 @@ jobs:
       run: |
         sudo apt update
         sudo apt install -y fpc lazarus lcl-utils lcl-gtk2
-        
-    - name: Compile Laz
-      run: |
-        which lazbuild
-        which fpc
         
     - name: Compile Lazarus project (.lpi)
       shell: bash
