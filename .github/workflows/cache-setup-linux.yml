@@ -1,4 +1,4 @@
-name: Cache Lazarus & FPC for Linux
+name: Cache for Linux
 
 on:
   push:
