@@ -1,4 +1,4 @@
-name: Cache Lazarus & FPC
+name: Cache Lazarus & FPC for Windows
 
 on:
   workflow_dispatch:
