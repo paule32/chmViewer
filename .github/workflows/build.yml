@@ -26,14 +26,42 @@ jobs:
         echo %PATH%
         C:\lazarus\lazbuild.exe "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
         C:\lazarus\lazbuild.exe "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
-        dir
         
     - name: Compile chmViewer Project
       shell: cmd
       run: |
         set BASEDIR=%cd%
         dir %BASEDIR%
-        C:\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
+        C:\lazarus\fpc\3.2.2\bin\x86_64-win64\fpc.exe ^
+        -Twin64 ^
+        -Px86_64 ^
+        -MDelphi ^
+        -Scghim ^
+        -CX ^
+        -O3 ^
+        -XX ^
+        -WG ^
+        -l ^
+        -vewnhibq ^
+        -Filib\x86_64-win64 ^
+        -Fusrc ^
+        -FuD:\a\chmViewer\chmViewer\src\CEF4Delphi\packages\lib\x86_64-win64 ^
+        -FuC:\lazarus\components\ideintf\units\x86_64-win64\win32 ^
+        -FuC:\lazarus\components\lazcontrols\lib\x86_64-win64\win32 ^
+        -FuC:\lazarus\lcl\units\x86_64-win64\win32 ^
+        -FuC:\lazarus\lcl\units\x86_64-win64 ^
+        -FuC:\lazarus\components\freetype\lib\x86_64-win64 ^
+        -FuC:\lazarus\components\buildintf\units\x86_64-win64 ^
+        -FuC:\lazarus\components\lazutils\lib\x86_64-win64 ^
+        -FuC:\lazarus\packager\units\x86_64-win64 ^
+        -Fu. ^
+        -FUlib\x86_64-win64 ^
+        -FE. ^
+        -ochmViewer.exe ^
+        -dLCL ^
+        -dLCLwin32
+
+      #C:\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
     
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
