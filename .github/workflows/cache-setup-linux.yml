@@ -26,13 +26,14 @@ jobs:
           mkdir -p ~/tools
           cd ~/tools
           sudo apt-get install --reinstall libgtk2.0-0
-          #curl -L -o fpcupdeluxe https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/latest/download/fpcupdeluxe-x86_64-linux
-          #chmod +x fpcupdeluxe
-          #./fpcupdeluxe --installdir=~/tools/lazarus --fpcURL=stable --lazURL=stable
+          curl -L -o fpcupdeluxe https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/latest/download/fpcupdeluxe-x86_64-linux
+          chmod +x fpcupdeluxe
+          ./fpcupdeluxe --installdir=~/tools/lazarus --fpcURL=stable --lazURL=stable
 
       - name: Set PATH
         run: echo "$HOME/tools/lazarus" >> $GITHUB_PATH
 
       - name: Build with lazbuild
         run: |
-          lazbuild src/chmViewer.lpi
+          which lazbuild
+          #lazbuild src/chmViewer.lpi
