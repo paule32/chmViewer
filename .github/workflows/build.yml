@@ -12,30 +12,14 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v3
-
-    - name: Set up tools folder
-      shell: pwsh
+      
+    - name: Install Lazarus & FPC
       run: |
-          New-Item -ItemType Directory -Path "C:\tools" -Force
-
-    - name: Restore Lazarus/FPC Cache
-      uses: actions/cache@v4
-      id: cache-lazarus
-      with:
-        path: C:\tools\lazarus
-        key: lazarus-fpc-${{ runner.os }}-v1
-        restore-keys: lazarus-fpc-${{ runner.os }}-
-
-    - name: Installi Lazarus/FPC
-      if: steps.cache-lazarus.outputs.cache-hit != 'true'
-      shell: cmd
-      run: |
-        cd C:\tools
-        curl -L -o fpcupdeluxe.exe https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/latest/download/fpcupdeluxe-x86_64-win64.exe
-        .\fpcupdeluxe.exe --installdir=C:\tools\lazarus --fpcURL=stable --lazURL=stable
+        choco install fpc --yes
+        choco install lazarus --yes
 
     - name: Set PATH
-      run: echo "C:\tools\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
+      run: echo "C:\lazarus" | Out-File -FilePath $env:GITHUB_PATH -Append -Encoding ascii
 
     - name: Compile CHM Library Package
       shell: cmd
@@ -43,9 +27,9 @@ jobs:
         set BASEDIR=%cd%
         set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
-        C:\tools\lazarus\lazbuild.exe "%BASEDIR%\src\DCPcrypt\dcpcrypt_laz.lpk"
-        C:\tools\lazarus\lazbuild.exe "C:\tools\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
-        C:\tools\lazarus\lazbuild.exe "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
+        C:\lazarus\lazbuild.exe "%BASEDIR%\src\DCPcrypt\dcpcrypt_laz.lpk"
+        C:\lazarus\lazbuild.exe "C:\tools\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
+        C:\lazarus\lazbuild.exe "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
         
     - name: Compile chmViewer Project
       shell: cmd
