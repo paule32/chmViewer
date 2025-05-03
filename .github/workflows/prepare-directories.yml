@@ -1,0 +1,23 @@
+name: Prepare Tools Directory (Windows & Linux)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  setup-tools-dir:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    steps:
+      - name: Set up tools directory (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path "C:\tools" -Force
+
+      - name: Set up tools directory (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p ~/tools
