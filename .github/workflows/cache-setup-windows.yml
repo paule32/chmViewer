@@ -1,4 +1,4 @@
-name: Cache Lazarus & FPC for Windows
+name: Cache for Windows
 
 on:
   workflow_dispatch:
@@ -7,14 +7,19 @@ jobs:
   cache-lazarus:
     runs-on: windows-latest
     steps:
-      - name: Installiere Lazarus/FPC
+      - name: Prepare Directory
+        shell: pwsh
         run: |
-          mkdir C:\tools
+          New-Item -ItemType Directory -Path "C:\tools" -Force
+          
+      - name: Installi Lazarus/FPC
+        shell: cmd
+        run: |
           cd C:\tools
           curl -L -o fpcupdeluxe.exe https://github.com/LongDirtyAnimAlf/fpcupdeluxe/releases/latest/download/fpcupdeluxe-x86_64-win64.exe
           .\fpcupdeluxe.exe --installdir=C:\tools\lazarus --fpcURL=stable --lazURL=stable
 
-      - name: Cache Installationsverzeichnis
+      - name: Cache Install Folder
         uses: actions/cache@v4
         with:
           path: C:\tools\lazarus
