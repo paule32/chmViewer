@@ -24,10 +24,11 @@ jobs:
       shell: cmd
       run: |
         set %BASEDIR%=%cd%
-        set PATH=%PATH%;C:\tools\lazarus;C:\tools\lazarus\fpc\3.2.2\bin\x86_64-win64
+        set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
-        C:\tools\lazarus\lazbuild "C:\tools\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
-        C:\tools\lazarus\lazbuild "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_lazarus.lpk"
+        lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
+        lazbuild "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_Lazarus.lpk
+        dir
         
     - name: Compile chmViewer Project
       shell: cmd
