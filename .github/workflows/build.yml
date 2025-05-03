@@ -3,8 +3,6 @@ name: Build CHM Viewer
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build-windows:
@@ -14,26 +12,29 @@ jobs:
     steps:
     - name: Checkout source
       uses: actions/checkout@v3
-
-    - name: Install Lazarus & FPC
-      shell: cmd
-      run: |
-        choco install fpc --yes
-        choco install lazarus --yes
-
+      
+    - name: Restore Lazarus/FPC Cache
+      uses: actions/cache@v4
+      with:
+        path: C:\tools\lazarus
+        key: lazarus-fpc-${{ runner.os }}-v1
+        restore-keys: lazarus-fpc-${{ runner.os }}-
+    
     - name: Compile CHM Library Package
       shell: cmd
       run: |
-        set PATH=%PATH%;C:\lazarus;C:\lazarus\fpc\3.2.2\bin\x86_64-win64
+        set %BASEDIR%=%cd%
+        set PATH=%PATH%;C:\tools\lazarus;C:\tools\lazarus\fpc\3.2.2\bin\x86_64-win64
         echo %PATH%
-        C:\lazarus\lazbuild "C:\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
+        C:\tools\lazarus\lazbuild "C:\tools\lazarus\components\chmhelp\packages\help\lhelpcontrolpkg.lpk"
+        C:\tools\lazarus\lazbuild "%BASEDIR%\src\CEF4Delphi\packages\cef4delphi_lazarus.lpk"
         
     - name: Compile chmViewer Project
       shell: cmd
       run: |
         set BASEDIR=%cd%
         dir %BASEDIR%
-        C:\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
+        C:\tools\Lazarus\lazbuild.exe "%BASEDIR%\src\chmViewer.lpi
     
     - name: Upload Windows binary
       uses: actions/upload-artifact@v4
