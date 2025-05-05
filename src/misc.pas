@@ -10,7 +10,7 @@ uses
 type
   TLockedFile = record
     Handle: THandle;
-    FilePath: WideString;
+    FilePath: String;
   end;
 
 type
@@ -19,7 +19,7 @@ type
     NextEntryOffset: DWORD;
     Action: DWORD;
     FileNameLength: DWORD;
-    FileName: array[0..0] of WideChar;
+    FileName: array[0..0] of PChar;
   end;
 
   TFileLockerThread = class(TThread)
@@ -39,7 +39,7 @@ implementation
 
 procedure TFileLockerThread.LockFile(const FileName: string);
 var
-  FullPath: WideString;
+  FullPath: String;
   hFile: THandle;
   Entry: TLockedFile;
   Count: Integer;
@@ -59,6 +59,7 @@ begin
   if hFile <> INVALID_HANDLE_VALUE then
   begin
     //Writeln('Neue Datei gesperrt: ', FullPath);
+    ShowMessage('lock new file: ' + FullPath);
     Entry.Handle := hFile;
     Entry.FilePath := FullPath;
 
@@ -83,8 +84,7 @@ begin
     begin
       CloseHandle(FFiles[i].Handle);
       if not DeleteFileW(PWideChar(FFiles[i].FilePath)) then
-      ShowMessage('Error: could not delete: ' +
-      FFiles[i].FilePath + #10 + 'Error Code: ' + IntToStr(GetLastError));
+      ShowMessage('Error: could not delete: ' + FFiles[i].FilePath);
     end;
   finally
     LeaveCriticalSection(FLock);
@@ -141,10 +141,10 @@ begin
     begin
       NotifyInfo := @Buffer;
       repeat
-        SetString(FileName, NotifyInfo^.FileName, NotifyInfo^.FileNameLength div SizeOf(WideChar));
+        SetString(FileName, PChar(NotifyInfo^.FileName), NotifyInfo^.FileNameLength div SizeOf(WideChar));
 
         if NotifyInfo^.Action = FILE_ACTION_ADDED then
-          LockFile(FileName);
+          LockFile(PChar(FileName));
 
         if NotifyInfo^.NextEntryOffset = 0 then
           Break;

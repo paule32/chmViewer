@@ -7,6 +7,7 @@ interface
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
   Buttons, StdCtrls, Grids, Menus, RegExpr, base64, chmreader, chmfiftimain,
+  misc,
   uCEFChromiumWindow;
 
 type
@@ -57,10 +58,15 @@ type
     procedure BitBtn4Click(Sender: TObject);
     procedure BitBtn5Click(Sender: TObject);
     procedure ChromiumWindow1AfterCreated(Sender: TObject);
+    procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
+    procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure MenuItem5Click(Sender: TObject);
   private
+    DirPath: String;
     printFlag: Boolean;
+    LockerThread : TFileLockerThread;
+    function DeleteDirectory(const Path: string): Boolean;
   public
 
   end;
@@ -510,6 +516,59 @@ begin
       html.Clear;
       html.Free;
       html := nil;
+    end;
+  end;
+end;
+
+procedure TForm1.FormClose(Sender: TObject; var CloseAction: TCloseAction);
+begin
+  //if Assigned(LockerThread) then
+  //begin
+  //  LockerThread.Terminate;
+  //  LockerThread.WaitFor;
+  //  LockerThread.Free;
+  //end;
+  DeleteDirectory(DirPath);
+end;
+
+// Function to recursively delete a directory and its contents
+function TForm1.DeleteDirectory(const Path: string): Boolean;
+var
+  SearchRec: TSearchRec;
+begin
+  Result := False;
+  if FindFirst(Path + '\*.*', faAnyFile, SearchRec) = 0 then
+  try
+    repeat
+      if (SearchRec.Name <> '.') and (SearchRec.Name <> '..') then
+      begin
+        if (SearchRec.Attr and faDirectory) <> 0 then
+          DeleteDirectory(Path + '\' + SearchRec.Name)
+        else
+          DeleteFile(Path + '\' + SearchRec.Name);
+      end;
+    until FindNext(SearchRec) <> 0;
+  finally
+    FindClose(SearchRec);
+  end;
+  Result := RemoveDir(Path);
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+  try
+    DirPath := ExtractFilePath(ParamStr(0)) + '\lib';
+
+    if DirectoryExists(DirPath) then
+    RemoveDir(DirPath);
+    CreateDir(DirPath);
+
+    //LockerThread := TFileLockerThread.Create(self.DirPath);
+  except
+    on E: Exception do
+    begin
+      ShowMessage('Fehler beim Starten des Lockers: ' + E.Message);
+      Application.Terminate;
     end;
   end;
 end;
