@@ -151,16 +151,12 @@ var
   chmRead: TChmReader;
   chmStream: TFileStream;
 
-  topicResults: chmfiftimain.TChmWLCTopicArray;
-  titleResults: chmfiftimain.TChmWLCTopicArray;
 
   FIftiMainStream: TMemoryStream;
   htmlStream: TMemoryStream;
 
-  searchReader: TChmSearchReader;
   htmlText, newpath: String;
 
-  k, currTopic: Integer;
   html: TStringList;
 
   function EncodeBase64(const Buffer: Pointer; const Size: Integer): string;
@@ -285,6 +281,55 @@ var
       ForceDirectories(TEMP_FOLDER + '\lib');
       ForceDirectories(TEMP_FOLDER + '\lib\js');
     end;
+  end;
+
+  function ExtractHTMLLinks(const HTML: string): TStringList;
+  var
+    RE: TRegExpr;
+    MatchStr, srcvalue, s, newpath: string;
+    sl: TStringList;
+
+    function JavaScriptToBase64DataURI(const FileName: string): string;
+    begin
+      sl := TStringList.Create;
+      RE := TRegExpr.Create;
+      try
+        // sucht <a href="irgendwas.html"> oder <a href='irgendwas.htm'>
+        RE.Expression := '<a\s+[^>]*href\s*=\s*["'']([^"'']+\.(html?|HTML?))["'']';
+        RE.ModifierI := True;
+
+        if RE.Exec(HTML) then
+        repeat
+          SrcValue := RE.Match[1];
+          newpath  := TEMP_FOLDER;
+          s        := '/' + srcvalue;
+          CreateDirectories;
+
+          htmlStream.Clear;
+          htmlStream.Position := 0;
+
+          htmlStream := chmRead.GetObject(s);
+          if htmlStream = nil then
+          begin
+            ShowMessage('error: can not get:' + #10 + s);
+            Halt(3);
+          end;
+
+          newpath := Format('%s\%s', [newpath, SrcValue]);
+          newpath := StringReplace(NewPath, '/', '\', [rfReplaceAll]);
+
+          SaveStreamToTextFile(htmlStream, newpath);
+
+          s       := JavaScriptToBase64DataURI(NewPath);
+          result  := StringReplace(result, srcvalue, s, [rfReplaceAll]);
+
+        until not RE.ExecNext;
+      finally
+        RE.Free;
+      end;
+    end;
+  begin
+
   end;
 
   function ExtractJavaScriptSources(HTML: string): String;
@@ -469,6 +514,7 @@ var
     end;
   end;
 
+var i: Integer;
 begin
   if Assigned(ChromiumWindow1.ChromiumBrowser) then
   begin
@@ -494,6 +540,21 @@ begin
         html.LoadFromStream(htmlStream);
 
         htmlText := html.Text;
+
+        html.Clear;
+        html := ExtractHTMLLinks(htmlText);
+
+        for i := 0 to html.Count - 1 do
+        begin
+          htmlStream := chmRead.GetObject('/' + html[i]);
+          if htmlStream = nil then
+          begin
+            ShowMessage('object not found: ' + html[i]);
+            exit;
+          end;
+          htmlStream.Position := 0;
+          html.LoadFromStream(htmlStream);
+        end;
 
         htmlText := ExtractCSSLinks         (htmlText);
         htmlText := ExtractJavaScriptSources(htmlText);
@@ -556,21 +617,6 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 begin
-  try
-    DirPath := ExtractFilePath(ParamStr(0)) + '\lib';
-
-    if DirectoryExists(DirPath) then
-    RemoveDir(DirPath);
-    CreateDir(DirPath);
-
-    //LockerThread := TFileLockerThread.Create(self.DirPath);
-  except
-    on E: Exception do
-    begin
-      ShowMessage('Fehler beim Starten des Lockers: ' + E.Message);
-      Application.Terminate;
-    end;
-  end;
 end;
 
 procedure TForm1.FormShow(Sender: TObject);

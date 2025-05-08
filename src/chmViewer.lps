@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="13"/>
-        <CursorPos X="10" Y="44"/>
+        <CursorPos X="8" Y="20"/>
         <UsageCount Value="216"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
@@ -22,8 +22,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="523"/>
-        <CursorPos X="5" Y="530"/>
+        <TopLine Value="530"/>
+        <CursorPos X="13" Y="548"/>
         <UsageCount Value="216"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -33,138 +33,153 @@
         <Filename Value="misc.pas"/>
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="134"/>
-        <CursorPos Y="134"/>
-        <UsageCount Value="65"/>
+        <TopLine Value="123"/>
+        <CursorPos X="34" Y="153"/>
+        <UsageCount Value="125"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="22" Column="17" TopLine="10"/>
+        <Filename Value="misc.pas"/>
+        <Caret Line="120" Column="36" TopLine="92"/>
       </Position>
       <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="44" Column="16" TopLine="44"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="530" Column="5" TopLine="550"/>
       </Position>
       <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="3" Column="5"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="565" Column="10" TopLine="550"/>
       </Position>
       <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="71" Column="46" TopLine="54"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="567" Column="29" TopLine="550"/>
       </Position>
       <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="59" Column="28" TopLine="43"/>
-      </Position>
-      <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="55" Column="10" TopLine="55"/>
+        <Filename Value="main.pas"/>
+        <Caret Line="68" Column="37" TopLine="51"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="15" Column="21"/>
+        <Caret Line="32" Column="22" TopLine="14"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="8" Column="51"/>
+        <Caret Line="40" Column="28" TopLine="14"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="17"/>
+        <Caret Line="78" Column="10" TopLine="52"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="161" TopLine="137"/>
+        <Caret Line="79" Column="27" TopLine="52"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="24"/>
+        <Caret Line="71" Column="28" TopLine="71"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="88" TopLine="70"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="175" Column="23" TopLine="146"/>
+        <Caret Line="30" Column="10" TopLine="2"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="22" Column="31"/>
+        <Caret Line="66" Column="31" TopLine="38"/>
       </Position>
       <Position>
         <Filename Value="misc.pas"/>
-        <Caret Line="15" Column="61"/>
+        <Caret Line="70" Column="31" TopLine="43"/>
+      </Position>
+      <Position>
+        <Filename Value="misc.pas"/>
+        <Caret Line="100" Column="37" TopLine="88"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="119" Column="18" TopLine="85"/>
+        <Caret Line="559" TopLine="541"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="526" TopLine="504"/>
+        <Caret Line="578" Column="24" TopLine="549"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="521" TopLine="504"/>
+        <Caret Line="551" Column="20" TopLine="542"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="66" Column="37" TopLine="52"/>
+        <Caret Line="563" Column="3" TopLine="541"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="531" Column="62" TopLine="523"/>
+        <Caret Line="290" Column="28" TopLine="281"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="67" Column="14" TopLine="52"/>
-      </Position>
-      <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="14" Column="14"/>
+        <Caret Line="215" Column="53" TopLine="198"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="558" Column="5" TopLine="541"/>
+        <Caret Line="532" Column="34" TopLine="504"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="66" Column="21" TopLine="52"/>
-      </Position>
-      <Position>
-        <Filename Value="chmViewer.lpr"/>
-        <Caret Line="15" Column="14" TopLine="13"/>
+        <Caret Line="295" Column="25" TopLine="295"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="66" Column="21" TopLine="52"/>
+        <Caret Line="300" Column="11" TopLine="283"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="531" Column="28" TopLine="522"/>
+        <Caret Line="302" Column="35" TopLine="283"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="560" Column="52" TopLine="532"/>
+        <Caret Line="289" Column="25" TopLine="276"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="571" Column="7" TopLine="556"/>
+        <Caret Line="331" Column="5" TopLine="311"/>
       </Position>
       <Position>
         <Filename Value="main.pas"/>
-        <Caret Line="559" Column="3" TopLine="556"/>
+        <Caret Line="294" Column="9" TopLine="278"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="290" Column="10" TopLine="273"/>
+      </Position>
+      <Position>
+        <Filename Value="main.pas"/>
+        <Caret Line="547" Column="26" TopLine="530"/>
       </Position>
     </JumpHistory>
     <RunParams>
       <FormatVersion Value="2"/>
-      <Modes ActiveMode=""/>
+      <Modes ActiveMode="default">
+        <Mode Name="default">
+          <local>
+            <HostApplicationFilename Value="chmViewer.exe"/>
+            <CommandLineParams Value="test.chm"/>
+          </local>
+        </Mode>
+      </Modes>
     </RunParams>
+    <HistoryLists>
+      <List Name="WorkingDirectory" Type="File" Count="1"/>
+      <List Name="LaunchingApplication" Type="File" Count="1">
+        <Item1 Value="C:\Windows\system32\cmd.exe /C ${TargetCmdLine}"/>
+      </List>
+      <List Name="CommandLineParameters" Count="2">
+        <Item1 Value="test.chm"/>
+      </List>
+    </HistoryLists>
   </ProjectSession>
 </CONFIG>

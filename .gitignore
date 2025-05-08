@@ -8,3 +8,10 @@
 /src/chm/lib
 /src/chm/img
 /src/DCPcrypt/lib
+*.pak
+*.dll
+src/cef_sandbox.lib
+src/icudtl.dat
+src/v8_context_snapshot.bin
+src/vk_swiftshader_icd.json
+src/libcef.lib

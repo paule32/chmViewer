@@ -19,7 +19,7 @@ type
     NextEntryOffset: DWORD;
     Action: DWORD;
     FileNameLength: DWORD;
-    FileName: array[0..0] of PChar;
+    FileName: array[0..0] of WideChar;
   end;
 
   TFileLockerThread = class(TThread)
@@ -76,7 +76,10 @@ var
   i: Integer;
 begin
   if FDirHandle <> INVALID_HANDLE_VALUE then
+  begin
+    ShowMessage('FDirHandle Error');
     CloseHandle(FDirHandle);
+  end;
 
   EnterCriticalSection(FLock);
   try
@@ -100,6 +103,7 @@ begin
   FreeOnTerminate := False;
 
   FDirPath := IncludeTrailingPathDelimiter(DirPath);
+  ShowMessage('--> ' + FDirPath);
   InitializeCriticalSection(FLock);
 
   FDirHandle := CreateFileW(
@@ -115,6 +119,8 @@ begin
   if FDirHandle = INVALID_HANDLE_VALUE then
   raise Exception.CreateFmt('Error: could not open directory.' + #10 +
   'Error Code: ' + '%d', [GetLastError]);
+
+  ShowMessage('thread ok');
 end;
 
 procedure TFileLockerThread.Execute;
@@ -141,7 +147,7 @@ begin
     begin
       NotifyInfo := @Buffer;
       repeat
-        SetString(FileName, PChar(NotifyInfo^.FileName), NotifyInfo^.FileNameLength div SizeOf(WideChar));
+        SetString(FileName, NotifyInfo^.FileName, NotifyInfo^.FileNameLength div SizeOf(WideChar));
 
         if NotifyInfo^.Action = FILE_ACTION_ADDED then
           LockFile(PChar(FileName));
@@ -156,23 +162,6 @@ begin
     begin
       ShowMessage('Error: ReadDirectoryChangesW: ' + IntToStr(GetLastError));
     end;
-  end;
-end;
-
-procedure StartLock;
-var
-  LockerThread: TFileLockerThread;
-begin
-  try
-    LockerThread := TFileLockerThread.Create('C:\Test');
-    //Writeln('Überwachung läuft. ENTER zum Beenden...');
-    //Readln;
-    LockerThread.Terminate;
-    LockerThread.WaitFor;
-    LockerThread.Free;
-  except
-    on E: Exception do
-    ShowMessage('Error: ' + E.Message);
   end;
 end;
 
