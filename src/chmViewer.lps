@@ -22,8 +22,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="530"/>
-        <CursorPos X="13" Y="548"/>
+        <TopLine Value="537"/>
+        <CursorPos Y="555"/>
         <UsageCount Value="216"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -35,7 +35,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="123"/>
         <CursorPos X="34" Y="153"/>
-        <UsageCount Value="125"/>
+        <UsageCount Value="884"/>
         <Loaded Value="True"/>
         <DefaultSyntaxHighlighter Value="Delphi"/>
       </Unit>

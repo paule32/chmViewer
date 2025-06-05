@@ -543,7 +543,7 @@ begin
 
         html.Clear;
         html := ExtractHTMLLinks(htmlText);
-
+showmessage('1111');
         for i := 0 to html.Count - 1 do
         begin
           htmlStream := chmRead.GetObject('/' + html[i]);
@@ -552,6 +552,7 @@ begin
             ShowMessage('object not found: ' + html[i]);
             exit;
           end;
+          showmessage('==>>> ' + html[i]);
           htmlStream.Position := 0;
           html.LoadFromStream(htmlStream);
         end;
